@@ -12,11 +12,12 @@ var roles = {
 
 module.exports.loop = function() {
     clearMemory();
-
+    
     var spawn = Game.spawns.Alpha;
+    var creeps = Game.creeps;
 
-    for (let name in Game.creeps) {
-        var creep = Game.creeps[name];
+    for (let name in creeps) {
+        var creep = creeps[name];
         
         switch (creep.memory.role) {
             case "harvester": roleHarvester.run(creep, spawn); break;
@@ -24,10 +25,8 @@ module.exports.loop = function() {
             default: creep.say("DUMMY"); break;
         }
     }
-
     
-    var harvesterCount = _.sum(Game.creeps, (c) => c.memory.role == "harvester");
-
+    var harvesterCount = _.sum(creeps, (c) => c.memory.role == "harvester");
     if (harvesterCount < roles.harvester.minimum) {
         var name = spawn.createCreep([WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE], undefined, { role: "harvester", working: false});
         if (name != ERR_BUSY && name != ERR_NOT_ENOUGH_ENERGY) {
@@ -35,19 +34,19 @@ module.exports.loop = function() {
         }
     }
 
-    var upgraderCount = _.sum(Game.creeps, (c) => c.memory.role == "upgrader");
-
+    var upgraderCount = _.sum(creeps, (c) => c.memory.role == "upgrader");
     if (upgraderCount < roles.upgrader.minimum) {
         var name = spawn.createCreep([WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE], undefined, { role: "upgrader", working: false});
         if (name != ERR_BUSY && name != ERR_NOT_ENOUGH_ENERGY) {
             console.log("Spawned new upgrader: " + name);
         }
     }
-
+    
     function clearMemory() {
-        for (let name in Memory.creeps) {
+        var creepsMem = Memory.creeps;
+        for (let name in creepsMem) {
             if (Game.creeps[name] == undefined) {
-                delete Memory.creeps[name];
+                delete creepsMem[name];
             }
         }
     }
