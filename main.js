@@ -4,6 +4,9 @@ var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
 var roleRepairer = require('role.repairer');
 
+// 1x CARRY = 50 carry capacity
+// 1x WORK = 2 energy mined per tick
+
 var roles = {
     harvester: {
         minimum: 4,

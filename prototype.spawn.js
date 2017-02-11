@@ -1,30 +1,34 @@
 module.exports = function() {
+
+    var BODYPART_COST = {
+        WORK: 10,
+        MOVE: 5,
+        CARRY: 5,
+        ATTACK: 8,
+        HEAL: 25,
+        RANGED_ATTACK: 15,
+        TOUGH: 1,
+        CLAIM: 60
+    };
+
     StructureSpawn.prototype.createCustomCreep = function(energy, roleName) {
-        var partCount = Math.floor(energy / 10.0);
-
-        var body = [];
-        var counter = 0;
-
-        body.push(MOVE);
-        counter++;
-
-        if (counter < partCount) {
-            while (true) {
-                body.push(WORK);
-                counter++;
-                if (counter >= partCount || counter >= 50) break;
-
-                body.push(CARRY);
-                counter++;
-                if (counter >= partCount || counter >= 50) break;
-
-                body.push(MOVE);
-                counter++;
-                if (counter >= partCount || counter >= 50) break;
-            }
-
-        }
+        var partsSequence = [MOVE, WORK, CARRY];
+        var body = makeBody(energy, partsSequence);
 
         return this.createCreep(body, undefined, { role: roleName, working: false});
-    }
+    };
+
+    var makeBody = function(energy, partsSequence) {
+        var partCount = Math.min(50, Math.floor(energy / 10.0));
+        var partsSequenceLength = partsSequence.length;
+        var body = [];
+
+        for (let i = 0; i < partCount; i++) {
+            var partIndex = i % partsSequenceLength;
+            var part = partsSequence[partIndex];
+            body.push(part);
+        }
+
+        return body;
+    };
 };
