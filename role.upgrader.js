@@ -1,3 +1,5 @@
+var harvestEnergy = require('harvest.energy');
+
 module.exports = {
     run: function(creep) {
         var memory = creep.memory;
@@ -14,9 +16,9 @@ module.exports = {
                 creep.moveTo(creep.room.controller);
             }
         } else {
-            var source = creep.pos.findClosestByPath(FIND_SOURCES);
-            if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source);
+            var foundEnergy = harvestEnergy.retrieveFreeEnergy(creep);
+            if (!foundEnergy && creep.carry.energy > 0) {
+                memory.working = true;
             }
         }        
     }

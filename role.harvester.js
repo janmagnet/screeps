@@ -1,4 +1,5 @@
 var roleUpgrader = require('role.upgrader');
+var harvestEnergy = require('harvest.energy');
 
 module.exports = {
     run: function(creep) {
@@ -13,7 +14,7 @@ module.exports = {
 
         if (isWorking == true) {
             var structure = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
-                filter: (s) => (s.structureType == STRUCTURE_SPAWN || s.structureType == STRUCTURE_EXTENSION) && s.energy < s.energyCapacity
+                filter: (s) => ((s.structureType == STRUCTURE_SPAWN || s.structureType == STRUCTURE_EXTENSION) && s.energy < s.energyCapacity) || (s.structureType == STRUCTURE_STORAGE && s.storeCapacity - _.sum(s.store) > 0)
             });
             
             if (structure != undefined) {
@@ -34,9 +35,9 @@ module.exports = {
                 }
             }
         } else {
-            var source = creep.pos.findClosestByPath(FIND_SOURCES);
-            if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source);
+            var foundEnergy = harvestEnergy.harvestEnergy(creep);
+            if (!foundEnergy && creep.carry.energy > 0) {
+                memory.working = true;
             }
         }
     }

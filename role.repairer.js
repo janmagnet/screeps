@@ -1,4 +1,5 @@
 var roleBuilder = require('role.builder');
+var harvestEnergy = require('harvest.energy');
 
 module.exports = {
     run: function(creep) {
@@ -24,9 +25,9 @@ module.exports = {
                 roleBuilder.run(creep);
             }
         } else {
-            var source = creep.pos.findClosestByPath(FIND_SOURCES);
-            if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source);
+            var foundEnergy = harvestEnergy.retrieveFreeEnergy(creep);
+            if (!foundEnergy && creep.carry.energy > 0) {
+                memory.working = true;
             }
         }
     }
