@@ -1,5 +1,5 @@
 module.exports = {
-    run: function(creep, spawn) {
+    run: function(creep) {
         var memory = creep.memory;
         var isWorking = memory.working;
         
@@ -10,9 +10,16 @@ module.exports = {
         }
 
         if (isWorking == true) {
-            if (creep.transfer(spawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(spawn);
+            var structure = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+                filter: (s) => s.energy < s.energyCapacity
+            });
+            
+            if (structure != undefined) {
+                if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(structure);
+                }
             }
+
         } else {
             var source = creep.pos.findClosestByPath(FIND_SOURCES);
             if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
