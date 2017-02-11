@@ -1,6 +1,7 @@
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
+var roleRepairer = require('role.repairer');
 
 var roles = {
     harvester: {
@@ -10,6 +11,9 @@ var roles = {
         minimum: 8
     },
     builder: {
+        minimum: 2
+    },
+    repairer: {
         minimum: 2
     }
 };
@@ -27,6 +31,7 @@ module.exports.loop = function() {
             case "harvester": roleHarvester.run(creep, spawn); break;
             case "upgrader": roleUpgrader.run(creep); break;
             case "builder": roleBuilder.run(creep); break;
+            case "repairer": roleRepairer.run(creep); break;
             default: creep.say("DUMMY"); break;
         }
     }
@@ -52,15 +57,23 @@ module.exports.loop = function() {
             }
         }
 
+        var repairerCount = _.sum(creeps, (c) => c.memory.role == "repairer");
+        if (repairerCount < roles.repairer.minimum) {
+            var name = spawn.createCreep([WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], undefined, { role: "repairer", working: false});
+            if (name != ERR_BUSY && name != ERR_NOT_ENOUGH_ENERGY) {
+                console.log("Spawned new repairer: " + name);
+                return;
+            }
+        }
+
         var builderCount = _.sum(creeps, (c) => c.memory.role == "builder");
         if (builderCount < roles.builder.minimum) {
-            var name = spawn.createCreep([WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], undefined, { role: "builder", working: false});
+            var name = spawn.createCreep([WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], undefined, { role: "builder", working: false});
             if (name != ERR_BUSY && name != ERR_NOT_ENOUGH_ENERGY) {
                 console.log("Spawned new builder: " + name);
                 return;
             }
         }
-
     }
 
     function clearMemory() {
