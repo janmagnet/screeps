@@ -1,3 +1,4 @@
+require('prototype.spawn')();
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
@@ -5,23 +6,19 @@ var roleRepairer = require('role.repairer');
 
 var roles = {
     harvester: {
-        minimum: 6,
-        parts: [WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
+        minimum: 4,
         workFunc: roleHarvester.run
     },
     upgrader: {
-        minimum: 8,
-        parts: [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE],
+        minimum: 3,
         workFunc: roleUpgrader.run
    },
     repairer: {
         minimum: 2,
-        parts: [WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
         workFunc: roleRepairer.run
     },
     builder: {
         minimum: 2,
-        parts: [WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
         workFunc: roleBuilder.run
      }
 };
@@ -44,11 +41,12 @@ module.exports.loop = function() {
     }
     
     // Spawn new creeps.
-    for (var roleName in roles) {
+    for (let roleName in roles) {
         var role = roles[roleName];
         var creepCount = _.sum(creeps, (c) => c.memory.role == roleName);
         if (creepCount < role.minimum) {
-            var name = spawn.createCreep(role.parts, undefined, { role: roleName, working: false});
+            var energy = spawn.room.energyAvailable;
+            var name = spawn.createCustomCreep(energy, roleName);
             if (name != ERR_BUSY && name != ERR_NOT_ENOUGH_ENERGY) {
                 console.log("Spawned new " + roleName + ": " + name);
                 break;
