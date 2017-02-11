@@ -1,3 +1,5 @@
+var roleUpgrader = require('role.upgrader');
+
 module.exports = {
     run: function(creep) {
         var memory = creep.memory;
@@ -18,6 +20,8 @@ module.exports = {
                 if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(structure);
                 }
+            } else {
+                roleUpgrader.run(creep);
             }
 
         } else {
