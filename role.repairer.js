@@ -1,7 +1,7 @@
 var roleBuilder = require('role.builder');
 
 module.exports = {
-    run: function(creep, spawn) {
+    run: function(creep) {
         var memory = creep.memory;
         var isWorking = memory.working;
         
