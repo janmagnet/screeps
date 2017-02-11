@@ -12,7 +12,7 @@ module.exports = {
         }
 
         if (isWorking == true) {
-            var structures = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            var structure = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                 filter: (s) => s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL
             });
 
@@ -21,7 +21,7 @@ module.exports = {
                     creep.moveTo(structure);
                 }
             } else {
-                role.roleBuilder.run(creep);
+                roleBuilder.run(creep);
             }
         } else {
             var source = creep.pos.findClosestByPath(FIND_SOURCES);

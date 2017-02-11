@@ -18,7 +18,7 @@ module.exports = {
                     creep.moveTo(constructionSite);
                 }
             } else {
-                role.roleUpgrader.run(creep);
+                roleUpgrader.run(creep);
             }
         } else {
             var source = creep.pos.findClosestByPath(FIND_SOURCES);
