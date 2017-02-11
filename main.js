@@ -10,7 +10,7 @@ var roles = {
         workFunc: roleHarvester.run
     },
     upgrader: {
-        minimum: 3,
+        minimum: 2,
         workFunc: roleUpgrader.run
    },
     repairer: {
