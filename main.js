@@ -35,6 +35,8 @@ module.exports.loop = function() {
     // Execute creep actions.
     for (let name in creeps) {
         var creep = creeps[name];
+        if (creep.spawning) continue;
+
         var creepRole = roles[creep.memory.role];
         if (creepRole != undefined) {
             creepRole.workFunc.apply(this, [creep]);
