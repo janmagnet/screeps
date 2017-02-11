@@ -29,7 +29,7 @@ module.exports.loop = function() {
     var spawn = Game.spawns.Alpha;
     var creeps = Game.creeps;
 
-    // Execute creep work.
+    // Execute creep actions.
     for (let name in creeps) {
         var creep = creeps[name];
         var creepRole = roles[creep.memory.role];
@@ -37,6 +37,18 @@ module.exports.loop = function() {
             creepRole.workFunc.apply(this, [creep]);
         } else {
             creep.say("DUMMY");
+        }
+    }
+
+    // Execute tower actions.
+    var towers = spawn.room.find(FIND_STRUCTURES, {
+        filter: (s) => s.structureType == STRUCTURE_TOWER
+    });
+
+    for (let tower of towers) {
+        var target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        if (target != undefined) {
+            tower.attack(target);
         }
     }
     
