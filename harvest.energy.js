@@ -1,13 +1,13 @@
 module.exports = {
     retrieveFreeEnergy: function(creep) {
-        var canHarvest = module.exports.harvestEnergy(creep);
-        if (canHarvest) return true;
-
         var canPickupDroppedEnergy = module.exports.pickupDroppedEnergy(creep);
         if (canPickupDroppedEnergy) return true;
 
         var canRetrieveStoredEnergy = module.exports.retrieveStoredEnergy(creep);
         if (canRetrieveStoredEnergy) return true;
+
+        var canHarvest = module.exports.harvestEnergy(creep);
+        if (canHarvest) return true;
 
         console.log(creep.name + " cannot find free energy.")
         return false;
