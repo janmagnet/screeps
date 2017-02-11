@@ -22,7 +22,36 @@ module.exports = {
                     creep.moveTo(structure);
                 }
             } else {
-                roleBuilder.run(creep);
+                // Repair walls and ramparts after all other structures.
+                var walls = creep.room.find(FIND_STRUCTURES, {
+                    filter: (s) => s.hits < s.hitsMax && (s.structureType == STRUCTURE_WALL || s.structureType == STRUCTURE_RAMPART)
+                });
+                
+                var weakestWalls = [];
+                for (let wall of walls) {
+                    if (weakestWalls.length == 0 || wall.hits < weakestWalls[0].hits)
+                        weakestWalls = [wall];
+                    if (wall.hits == weakestWalls[0].hits)
+                        weakestWalls.push(wall);
+                }
+
+                if (weakestWalls.length > 0) {
+                    var wallIds = _.map(weakestWalls, (w) => w.id);
+                    var weakestWall = undefined;
+                    if (wallIds.length == 1) {
+                        weakestWall = weakestWalls[0];
+                    } else {
+                        weakestWall = creep.pos.findClosestByPath(weakestWalls);
+                        if (weakestWall == undefined)
+                            weakestWall = weakestWalls[0];
+                    }
+
+                    if (creep.repair(weakestWall) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(weakestWall);
+                    }
+                } else {
+                    roleBuilder.run(creep);
+                }
             }
         } else {
             var foundEnergy = harvestEnergy.retrieveFreeEnergy(creep);
