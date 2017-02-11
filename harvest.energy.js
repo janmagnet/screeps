@@ -37,9 +37,11 @@ module.exports = {
     },
 
     retrieveStoredEnergy: function(creep) {
-        var source = creep.pos.findClosestByPath(FIND_STRUCTURES, (s) => (s.structureType == STRUCTURE_STORAGE || s.structureType == STRUCTURE_CONTAINER) && s.store.energy > 0);
+        var source = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            filter: (s) => (s.structureType == STRUCTURE_STORAGE || s.structureType == STRUCTURE_CONTAINER) && s.store[RESOURCE_ENERGY] > 0
+        });
         if (source == undefined) return false;
-
+        
         if (creep.withdraw(source, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
             creep.moveTo(source);
         }
