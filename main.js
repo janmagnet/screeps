@@ -5,17 +5,25 @@ var roleRepairer = require('role.repairer');
 
 var roles = {
     harvester: {
-        minimum: 6
+        minimum: 6,
+        parts: [WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
+        workFunc: roleHarvester.run
     },
     upgrader: {
-        minimum: 8
+        minimum: 8,
+        parts: [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE],
+        workFunc: roleUpgrader.run
+   },
+    repairer: {
+        minimum: 2,
+        parts: [WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
+        workFunc: roleRepairer.run
     },
     builder: {
-        minimum: 2
-    },
-    repairer: {
-        minimum: 2
-    }
+        minimum: 2,
+        parts: [WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
+        workFunc: roleBuilder.run
+     }
 };
 
 module.exports.loop = function() {
@@ -24,54 +32,26 @@ module.exports.loop = function() {
     var spawn = Game.spawns.Alpha;
     var creeps = Game.creeps;
 
+    // Execute creep work.
     for (let name in creeps) {
         var creep = creeps[name];
-        
-        switch (creep.memory.role) {
-            case "harvester": roleHarvester.run(creep); break;
-            case "upgrader": roleUpgrader.run(creep); break;
-            case "builder": roleBuilder.run(creep); break;
-            case "repairer": roleRepairer.run(creep); break;
-            default: creep.say("DUMMY"); break;
+        var creepRole = roles[creep.memory.role];
+        if (creepRole != undefined) {
+            creepRole.workFunc.apply(this, [creep]);
+        } else {
+            creep.say("DUMMY");
         }
     }
     
-    spawnCreeps(spawn, creeps);
-    
-    function spawnCreeps(spawn, creeps) {
-        var harvesterCount = _.sum(creeps, (c) => c.memory.role == "harvester");
-        if (harvesterCount < roles.harvester.minimum) {
-            var name = spawn.createCreep([WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], undefined, { role: "harvester", working: false});
+    // Spawn new creeps.
+    for (var roleName in roles) {
+        var role = roles[roleName];
+        var creepCount = _.sum(creeps, (c) => c.memory.role == roleName);
+        if (creepCount < role.minimum) {
+            var name = spawn.createCreep(role.parts, undefined, { role: roleName, working: false});
             if (name != ERR_BUSY && name != ERR_NOT_ENOUGH_ENERGY) {
-                console.log("Spawned new harvester: " + name);
-                return;
-            }
-        }
-
-        var upgraderCount = _.sum(creeps, (c) => c.memory.role == "upgrader");
-        if (upgraderCount < roles.upgrader.minimum) {
-            var name = spawn.createCreep([WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], undefined, { role: "upgrader", working: false});
-            if (name != ERR_BUSY && name != ERR_NOT_ENOUGH_ENERGY) {
-                console.log("Spawned new upgrader: " + name);
-                return;
-            }
-        }
-
-        var repairerCount = _.sum(creeps, (c) => c.memory.role == "repairer");
-        if (repairerCount < roles.repairer.minimum) {
-            var name = spawn.createCreep([WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], undefined, { role: "repairer", working: false});
-            if (name != ERR_BUSY && name != ERR_NOT_ENOUGH_ENERGY) {
-                console.log("Spawned new repairer: " + name);
-                return;
-            }
-        }
-
-        var builderCount = _.sum(creeps, (c) => c.memory.role == "builder");
-        if (builderCount < roles.builder.minimum) {
-            var name = spawn.createCreep([WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], undefined, { role: "builder", working: false});
-            if (name != ERR_BUSY && name != ERR_NOT_ENOUGH_ENERGY) {
-                console.log("Spawned new builder: " + name);
-                return;
+                console.log("Spawned new " + roleName + ": " + name);
+                break;
             }
         }
     }
